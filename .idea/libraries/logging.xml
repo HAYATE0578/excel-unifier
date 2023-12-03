@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="logging">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/org/apache/logging" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
