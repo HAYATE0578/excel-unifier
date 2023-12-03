@@ -17,9 +17,14 @@ ExcelUnifier.exe是可以单独执行的exe文件，把此文件拖入某个文�
 ExcelUnifier.exeは単独で実行可能なファイルです。このファイルを特定のフォルダにドラッグして実行すると、そのフォルダ内のすべてのExcelファイルの形式を統一化します。  
 
 ## Supported Excel Formats/可处理的Excel类型/処理できるExcel型
-  
-
 | Excel Type |
 |-------|
 | .xls|
 | .xlsx |
+
+## Tools/工具/ツール
++ Idea64
++ Apache POI
++ Jdk-21.0.1.12
++ Java Swing
++ ChatGpt 3.5
