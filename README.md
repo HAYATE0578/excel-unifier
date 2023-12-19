@@ -10,17 +10,26 @@ In the IT field in Japan, there are times when we have to deal with a large numb
 日本のIT現場では、大量のExcelファイルを扱うことがあります。レビューで、最終的には各シートをA1セルにロックし、ズームを100％に設定し、最初のシートを表示するのはおすすめです。必須ではないですが、やればましです。この手間のかかる課題に対処するために、私はJavaでスクリプトを作成しました。  
 
 ## How to use/用法/使い方
-The ExcelUnifier.exe is a standalone executable file. When you drag this file into a specific folder and execute it, it will standardize the format of all Excel files in the current folder.  
+The ExcelUnifier.exe is a standalone executable file. When you drag and drop this file into a folder, then execute it to standardize the format of all Excel files in the current folder and its subfolders(recursion).  
 
-ExcelUnifier.exe是可以单独执行的exe文件，把此文件拖入某个文件夹后执行，就可以把当前文件夹的所有excel文件的格式统一化。  
+ExcelUnifier.exe是可以单独执行的exe文件，把此文件拖入某个文件夹后执行，就可以把当前文件夹的所有Excel文件和子文件夹内的Excel文件的格式格式统一化(递归的)。  
 
-ExcelUnifier.exeは単独で実行可能なファイルです。このファイルを特定のフォルダにドラッグして実行すると、そのフォルダ内のすべてのExcelファイルの形式を統一化します。  
+ExcelUnifier.exeは単独で実行可能なファイルです。このファイルを特定のフォルダにドラッグして実行すると、そのフォルダ内のすべてのExcelファイルと子フォルダのExcel形式を統一化します。  
 
 ## Supported Excel Formats/可处理的Excel类型/処理できるExcel型
 | Excel Type |
 |-------|
 | .xls|
 | .xlsx |
+| .xlsb |
+| .xltx |
+| .xltm |
+| .xlt |
+| .xlam |
+| .xla |
+| .xlw |
+| .xlr |
+| .xls |
 
 ## Tools/工具/ツール
 + Idea64
