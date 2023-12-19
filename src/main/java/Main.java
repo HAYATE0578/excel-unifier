@@ -1,33 +1,46 @@
-import org.apache.poi.ss.formula.functions.T;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class Main {
-    public static void main(String[] args) {
-        // Get all excel files in this local folder. 获取当前目录下所有的Excel文件
-        File currentDirectory = new File(".");
-        File[] excels = currentDirectory.listFiles((dir, name) -> name.endsWith(".xlsx") || name.endsWith(".xls"));
 
-        // If there are not excels reported it. 如果没有excel文件则报告。
-        if (excels != null && excels.length > 0) {
-            for (File excel : excels) {
+    static java.util.List<File> excels = new ArrayList<File>();
+
+    public static void main(String[] args) {
+
+        // Return the main method if excel.exe is running . 如果excel.exe在运行则退出。
+        if(isExcelRunning()){
+            Pop.popExcelIsRunning();
+            return;
+        }
+        // Pop a window to show status. 创造一个窗口来显示状态。
+        JFrame status = Pop.popStatus();
+
+        // Get all Excel files in this local folder(recursion). 获取当前目录下所有的Excel文件(迭代)
+        File currentDirectory = new File(".");
+        SearchExcelPath(currentDirectory);
+
+        File[] excelFiles =  excels.toArray(new File[0]);
+
+        // If there are not excelFiles reported it. 如果没有excel文件则报告。
+        if (excelFiles != null && excelFiles.length > 0) {
+            for (File excel : excelFiles) {
                 manipulateExcel(excel);
             }
-        } else {
-            System.out.println("No Excel files found in the current directory. 当前文件夹中并无excel文件。");
         }
 
-        System.out.println("----------Regulated: "+excels.length);
-        popWin(excels);
+        // At the end report. 最后汇报。
+        status.dispose();
+        Pop.popWin(excelFiles);
     }
 
     /**
@@ -53,47 +66,73 @@ public class Main {
                 // Activate the first sheet. 活性化第一张表格。
                 workbook.setActiveSheet(0);
 
+
                 // Save the Excel. 保存修改后的Excel文件
-                try (FileOutputStream fos = new FileOutputStream(excel.getName())) {
+                try (FileOutputStream fos = new FileOutputStream(excel.getAbsolutePath())) {
                     workbook.write(fos);
                 }
             }
 
-            System.out.println("----------Completed: " + excel.getName());
+            System.out.println("----------Completed: " + excel.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * At the last pop a window to show massage. 最后用一个窗口显示信息。
-     * @param excels To transmit the count. 用于传递处理过的数量。
+     * Check whether excel is running. 检查是否有Excel正在运行。
+     * @return whether excel is running.
      */
-    private static void popWin(File[] excels){
-        JFrame jFrame = new JFrame("Info");
-        JLabel jLabel = new JLabel("Regulated Excels count: "+excels.length, JLabel.CENTER);
-        JLabel jLabel2 = new JLabel("This window will close in 3s... ",JLabel.CENTER);
+    private static boolean isExcelRunning(){
+        try {
+            // Check whether there is excel threads in system. 检察是否有Excel的进程。
+            Process process = Runtime.getRuntime().exec("tasklist /FI \"IMAGENAME eq EXCEL.EXE \"");
 
-        JPanel jPanel = new JPanel(new GridLayout(2,1));
-        jPanel.add(jLabel);
-        jPanel.add(jLabel2);
+            // Read cmd.  读取命令输出
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
 
-        jFrame.getContentPane().add(jPanel);
-        jFrame.setSize(300, 100);
-        jFrame.setResizable(false);
-        jFrame.setLocationRelativeTo(null);
-        jFrame.setVisible(true);
-
-        Timer timer = new Timer(3000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jFrame.dispose();
+            // Read all lines. 读取所有行。
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("EXCEL.EXE")) {
+                    return true;
+                }
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    /**
+     * Search Excel files by recursion. 使用遍历的方式获得文件夹下所有excel。
+     * @param localFile A local path. 一个当前路径。
+     */
+    private static void SearchExcelPath(File localFile) {
+        File[] files = localFile.listFiles();
 
-        timer.setRepeats(false);
-        timer.start();
+        // Ref: https://support.microsoft.com/en-us/office/file-formats-that-are-supported-in-excel-0943ff2c-6014-4e8d-aaea-b83d51d46247
+        for (File f : files) {
+            if (f.isFile()){
+                String name = f.toString();
+                if(name.endsWith(".xlsx")
+                    || name.endsWith(".xlsm")
+                    || name.endsWith(".xlsb")
+                    || name.endsWith(".xltx")
+                    || name.endsWith(".xltm")
+                    || name.endsWith(".xlt")
+                    // name.endsWith(".xml") Apache Package is not compatible.
+                    || name.endsWith(".xlam")
+                    || name.endsWith(".xla")
+                    || name.endsWith(".xlw")
+                    || name.endsWith(".xlr")
+                    || name.endsWith(".xls")){
+                        excels.add(f);
+                    }
+            }
+            else if (f.isDirectory()) {
+                SearchExcelPath(f);
+            }
+        }
     }
 }
